@@ -6,10 +6,10 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
-activityCompose = "1.9.7"
+activityCompose = "1.9.0"
 kotlin = "2.0.21"
 composeBom = "2024.09.00"
-navigationCompose = "2.8.4"
+navigationCompose = "2.7.7"
 hilt = "2.51.1"
 room = "2.6.1"
 ksp = "2.0.21-1.0.27"
@@ -36,7 +36,7 @@ androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-te
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended"}
 androidx-compose-foundation = { module = "androidx.compose.foundation:foundation"}
-androidx-navigation-compose = { module = "androidx.compose.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 
 #Test
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -69,4 +69,3 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin"}
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt"}
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp"}
-

@@ -8,6 +8,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.academy.taskflow.ui.screens.TaskDetailScreen
+import com.academy.taskflow.ui.screens.TaskListScreen
 import com.academy.taskflow.viewModel.TaskViewModel
 
 
@@ -42,8 +44,6 @@ sealed class Screen(val route: String){
 fun AppNavigation(viewModel: TaskViewModel = viewModel()){
     val navController = rememberNavController()
 
-    val viewModel: TaskViewModel = viewModel()
-
     /**collectAsStateWithLifecyle: si fermerà in background.
      * Grazie a ciò risparmierà risorse (esempio: risparmio batteria).
      * Avere l'app in background significa avere l'app non visbile.
@@ -72,7 +72,7 @@ fun AppNavigation(viewModel: TaskViewModel = viewModel()){
                         Screen.TaskDetail.createRoute(id)
                     )
                 },
-                onToogleDone = {
+                onToggleDone = {
                     id -> viewModel.toggleDone(id)
                 }
             )
@@ -89,7 +89,7 @@ fun AppNavigation(viewModel: TaskViewModel = viewModel()){
                 }
             )
         ) {
-            backstack ->
+            backStack ->
             val taskId = backStack.arguments?.getString("taskId") ?: ""
 
             TaskDetailScreen(
