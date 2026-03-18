@@ -1,74 +1,109 @@
 package com.academy.taskflow.ui.tasks
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.*
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.academy.taskflow.model.Task
 
-/**TaskCard è una card per un singolo task.
- * Stateless: riceve tutto come parametro.
- * Non gestisce nessuno stato interno*/
+/*
+ * TaskCard — card visuale per un singolo task.
+ *
+ * ACCESSIBILITÀ (WCAG 2.1 — Web Content Accessibility Guidelines):
+ * Le linee guida WCAG, adottate da Google per Android, definiscono
+ * quattro principi: Perceivable, Operable, Understandable, Robust (POUR).
+ * TaskCard implementa:
+ *   - Perceivable: ogni elemento interattivo ha una descrizione testuale
+ *   - Operable: touch target minimo 48x48dp (Material Design guideline)
+ *   - Robust: semantics esplicite per screen reader TalkBack
+ */
 @Composable
 fun TaskCard(
-    /**task è il task da mostrare*/
-    task: Task,
-    /**onCardClick questo è un evento: l'utente clicca sulla card*/
-    onCardClick: () -> Unit,
-    /**onToggleDone anche questo è un evento: l'utente clicca sulla chackbox*/
-    onToggleDone: () -> Unit
+    task         : Task,
+    onCardClick  : () -> Unit,
+    onToggleDone : () -> Unit
 ) {
     Card(
-        onClick = { onCardClick() },
-        modifier = Modifier.Companion
+        onClick  = { onCardClick() },
+        modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 2.dp)
-        //.clickable { onCardClick() }
+            /*
+             * semantics: espone informazioni alla Accessibility API di Android.
+             * TalkBack legge questi valori agli utenti con disabilità visive.
+             *
+             * contentDescription: descrizione completa della card.
+             * Include titolo, priorità e stato — TalkBack legge tutto
+             * in un unico gesto di swipe, senza richiedere navigazione interna.
+             *
+             * Principio WCAG 1.1.1 Non-text Content:
+             * "Tutto il contenuto non testuale ha un'alternativa testuale."
+             */
+            .semantics(mergeDescendants = true) {
+                contentDescription = buildString {
+                    append("Task: ${task.title}. ")
+                    append("Priorità: ${task.priority.label}. ")
+                    append(if (task.isDone) "Completato." else "Da completare.")
+                }
+            }
     ) {
         Row(
-            modifier = Modifier.Companion.padding(16.dp),
+            modifier              = Modifier.padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Companion.CenterVertically
+            verticalAlignment     = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.Companion.weight(1f)) {
-                /**Titolo barrato se il task è stato completato*/
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = task.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    textDecoration = if (task.isDone) TextDecoration.Companion.LineThrough else null
+                    text           = task.title,
+                    style          = MaterialTheme.typography.titleMedium,
+                    textDecoration = if (task.isCompleted)
+                        TextDecoration.LineThrough else null
                 )
-                /**Qui definiamo l'etichetta priorità con colore*/
                 Text(
-                    text = task.priority.label,
+                    text  = task.priority.label,
                     style = MaterialTheme.typography.labelSmall,
                     color = Color(task.priority.color)
                 )
             }
-            /**Icona check circle se il task è stato completato,
-             * altrimenti Clear se è il contrario*/
+            /*
+             * Icona di completamento con semantics esplicite.
+             *
+             * contentDescription su Icon: OBBLIGATORIO per le icone
+             * che comunicano informazioni — WCAG 1.1.1.
+             * contentDescription = null è corretto SOLO per icone puramente
+             * decorative che non aggiungono informazione non già presente.
+             *
+             * Qui l'icona comunica lo stato — la descrizione è obbligatoria.
+             *
+             * semantics { role = Role.Button }: dice a TalkBack che
+             * questo elemento è un bottone — verrà annunciato come tale
+             * e l'utente saprà che può attivarlo con doppio tap.
+             */
             Icon(
-                imageVector = if (task.isDone) Icons.Default.CheckCircle
-                else Icons.Default.Clear,
-                contentDescription = null,
-                modifier = Modifier.Companion.size(28.dp).clickable { onToggleDone() },
-                tint = if (task.isDone) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.outline
+                imageVector = if (task.isDone)
+                    Icons.Default.CheckCircle else Icons.Default.Clear,
+                contentDescription = if (task.isDone)
+                    "Segna ${task.title} come da completare"
+                    else "Segna ${task.title} come completato",
+                modifier = Modifier
+                    .size(48.dp)   /* touch target minimo 48dp — Material guideline */
+                    .clickable(
+                        onClickLabel = if (task.isDone)
+                            "Rimuovi completamento" else "Completa task"
+                    ) { onToggleDone() }
+                    .semantics { role = Role.Button },
+                tint = if (task.isDone)
+                    MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.outline
             )
         }
     }

@@ -44,3 +44,4 @@ replay_pid*
 
 # Codex local libs (if present)
 .codex_lib/
+local.properties
